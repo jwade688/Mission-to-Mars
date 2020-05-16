@@ -6,21 +6,27 @@ import datetime as dt
 
 def scrape_all():
     # Initiate headless driver for deployment
-    browser = Browser("chrome", executable_path="chromedriver", headless=True)
-
-news_title, news_paragraph = mars_news(browser)
-
-# Run all scraping functions and store results in dictionary
-data = {
-    "news_title": news_title,
-    "news_paragraph": news_paragraph,
-    "featured_image": featured_image(browser),
-    "facts": mars_facts(),
-    "last_modified": dt.datetime.now()
-}
+    executable_path = {'executable_path': '/usr/local/bin/chromedriver'}
+    browser = Browser('chrome', **executable_path, headless=False)
+    
+    news_title, news_paragraph = mars_news(browser)
+    
+    #Run all scraping functions and store results in dictionary
+    data = {
+        "news_title": news_title,
+        "news_paragraph": news_paragraph,
+        "featured_image": featured_image(browser),
+        "facts": mars_facts(),
+        "last_modified": dt.datetime.now()
+    }
+        
+    # End the browsing session
+    browser.quit()
+    # Signal that the function is complete
+    return data
 
 # Create a mars_news function
-def mars_news(broswer):
+def mars_news(browser):
     # Visit the mars nasa new site
     url = 'https://mars.nasa.gov/news/'
     browser.visit(url)
@@ -109,12 +115,6 @@ def mars_facts():
     # Return and convert the DF back to html for later use
     return df.to_html()
 
-# End the browsing session
-browser.quit()
-
-# Signal that the function is complete
-return data
-
 if __name__ == "__main__":
     # If running as script, print scraped data
-    print(scrape_all())
+    print(scrape_all)
