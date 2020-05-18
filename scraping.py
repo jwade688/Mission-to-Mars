@@ -16,6 +16,7 @@ def scrape_all():
         "news_title": news_title,
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
+        "hemisphere_image": hemisphere_images(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now()
     }
@@ -99,6 +100,36 @@ def featured_image(browser):
     # Return the image
     return img_url
 
+### Hemisphere images
+
+def hemisphere_images(browser):
+    # Visit URL
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    # Parse the HTML
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')   
+
+    # Find thumbnails url and make a list for the 4 thumbnails
+    thumbs = soup.find_all('div', class_='item')
+
+    links = []
+    for thumb in thumbs:
+        links.append("https://astrogeology.usgs.gov" + thumb.find('a', href=True)['href'])  
+    
+    img_list = []
+
+    # Loop through each url turn the image and title into a dict and add it to a list of dicts
+    for link in links:
+        browser.visit(link)
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
+        img_url_dict = {"img": "https://astrogeology.usgs.gov" + soup.find('img', class_='wide-image').get('src'), 
+                    "title": soup.find('h2', class_='title').text}
+        img_list.append(img_url_dict)
+
+    return img_list
 
 ### Mars Facts
 
